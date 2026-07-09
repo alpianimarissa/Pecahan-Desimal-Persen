@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastery FDP: Menaklukkan Pecahan Kompleks & Soal Cerita Jebakan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- MathJax Configuration for perfect LaTeX rendering in Dynamic JS content -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8FAFC;
+        }
+        .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .math-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-tr from-[#F0FDFA] via-[#F8FAFC] to-[#EFF6FF] min-h-screen flex flex-col justify-between overflow-x-hidden select-none">
+
+    <!-- TOP HEADER -->
+    <header class="bg-white/95 backdrop-blur-md border-b-4 border-teal-600 py-3.5 px-6 flex justify-between items-center sticky top-0 z-40 shadow-sm">
+        <div class="flex items-center gap-3">
+            <span class="text-3xl animate-bounce">🔬</span>
+            <div>
+                <h1 class="heading-font text-xl md:text-2xl font-bold text-teal-900">Lab FDP Mastery</h1>
+                <p class="text-[10px] text-teal-600 font-extrabold tracking-wider uppercase">Visualisasi & Penalaran Logika Cerita SMA</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2.5">
+            <!-- XP Score Badge -->
+            <div class="bg-teal-50 border-2 border-teal-300 rounded-full px-4 py-1 flex items-center gap-1.5 shadow-sm">
+                <span class="text-xs">💎</span>
+                <span id="score-display" class="font-extrabold text-teal-700 text-xs md:text-sm">0 XP</span>
+            </div>
+            <!-- Scratchpad Toggle -->
+            <button onclick="toggleScratchpad()" class="bg-amber-50 hover:bg-amber-100 border-2 border-amber-400 active:scale-95 transition text-amber-800 font-bold rounded-full px-3 py-1 text-xs md:text-sm shadow-sm flex items-center gap-1">
+                ✏️ <span class="hidden sm:inline">Papan Cakar</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- SCRATCHPAD DRAWING PANEL (Papan Cakar Aljabar) -->
+    <div id="scratchpad" class="hidden fixed inset-0 z-50 bg-white/95 flex flex-col p-4">
+        <div class="flex justify-between items-center mb-3 border-b-2 border-gray-100 pb-2">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">✏️</span>
+                <h3 class="heading-font text-lg font-bold text-slate-800">Papan Cakar FDP & Coretan Aljabar</h3>
+            </div>
+            <div class="flex items-center gap-2">
+                <!-- Color pickers -->
+                <button onclick="setCanvasColor('#000000')" class="w-6 h-6 rounded-full bg-black border-2 border-white ring-2 ring-black/10"></button>
+                <button onclick="setCanvasColor('#0284c7')" class="w-6 h-6 rounded-full bg-sky-600 border-2 border-white ring-2 ring-black/10"></button>
+                <button onclick="setCanvasColor('#dc2626')" class="w-6 h-6 rounded-full bg-red-600 border-2 border-white ring-2 ring-black/10"></button>
+                <button onclick="setCanvasColor('#0d9488')" class="w-6 h-6 rounded-full bg-teal-600 border-2 border-white ring-2 ring-black/10"></button>
+                <span class="mx-1 text-gray-300">|</span>
+                <button onclick="clearCanvas()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-3 py-1.5 rounded-xl text-xs transition">Hapus</button>
+                <button onclick="toggleScratchpad()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-4 py-1.5 rounded-xl text-xs transition">Kembali Belajar</button>
+            </div>
+        </div>
+        <div class="flex-1 bg-[#FAFDFB] border-4 border-dashed border-teal-300 rounded-2xl relative cursor-crosshair overflow-hidden">
+            <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full"></canvas>
+        </div>
+        <p class="text-xs text-slate-400 mt-2 text-center">Tulis coret-coretan pecahan desimal, penyederhanaan KPK, atau variabel pembantu di atas!</p>
+    </div>
+
+    <!-- MAIN INTERACTIVE PORTAL -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- SIDEBAR NAVIGATION MENU -->
+        <nav class="lg:col-span-3 bg-white border border-slate-200 rounded-3xl p-4 shadow-sm space-y-2">
+            <h3 class="heading-font text-xs font-black text-slate-400 uppercase tracking-wider px-3 mb-2">Modul Belajar</h3>
+            
+            <button onclick="switchSection('tujuan')" id="nav-tujuan" class="w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 bg-teal-50 text-teal-900 border border-teal-100">
+                <span>🎯</span> Tujuan Belajar
+            </button>
+            
+            <button onclick="switchSection('warmup')" id="nav-warmup" class="w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 text-slate-600 hover:bg-slate-50">
+                <span>⚡</span> Warm-up (8 Soal)
+            </button>
+            
+            <button onclick="switchSection('konsep')" id="nav-konsep" class="w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 text-slate-600 hover:bg-slate-50">
+                <span>📖</span> Konsep & Teori FDP
+            </button>
+            
+            <button onclick="switchSection('simulator')" id="nav-simulator" class="w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 text-slate-600 hover:bg-slate-50">
+                <span>🧪</span> Visualizer Interaktif
+            </button>
+            
+            <button onclick="switchSection('contoh')" id="nav-contoh" class="w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 text-slate-600 hover:bg-slate-50">
+                <span>💡</span> Contoh Soal (5 Soal)
+            </button>
+            
+            <button onclick="switchSection('mandiri')" id="nav-mandiri" class="w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 text-slate-600 hover:bg-slate-50">
+                <span>🏆</span> Mandiri Terbimbing (5)
+            </button>
+        </nav>
+
+        <!-- MAIN INTERACTIVE DISPLAY AREA -->
+        <section class="lg:col-span-9 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden min-h-[500px] flex flex-col justify-between">
+            
+            <!-- SECTION 1: TUJUAN BELAJAR -->
+            <div id="section-tujuan" class="p-6 md:p-8 space-y-6">
+                <div class="text-center md:text-left">
+                    <span class="bg-teal-100 text-teal-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Modul Pembuka</span>
+                    <h2 class="heading-font text-2xl md:text-4xl font-black text-slate-800 mt-2">Selamat Datang di Lab FDP Mastery!</h2>
+                    <p class="text-sm text-slate-500 mt-1 leading-relaxed">Kita tidak akan belajar berhitung dasar lagi, melainkan melatih ketajaman nalarmu membedah jebakan kalimat matematika.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-sky-50 border-2 border-sky-100 rounded-2xl p-4 flex gap-3">
+                        <span class="text-3xl">🚀</span>
+                        <div>
+                            <h4 class="font-bold text-sky-950 text-sm">Menembus Soal Cerita Berantai</h4>
+                            <p class="text-xs text-sky-800 mt-1 leading-relaxed">Belajar mengurai frasa seperti "persen dari sisa", "bagian berturut-turut", dan "rasio sisa campuran" tanpa terjebak operasi perkalian yang salah.</p>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-50 border-2 border-emerald-100 rounded-2xl p-4 flex gap-3">
+                        <span class="text-3xl">🧩</span>
+                        <div>
+                            <h4 class="font-bold text-emerald-950 text-sm">Aljabar Pecahan Kompleks</h4>
+                            <p class="text-xs text-emerald-800 mt-1 leading-relaxed">Menguasai trik melenyapkan penyebut bertingkat tinggi dengan metode perkalian KPK dalam satu baris pengerjaan.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs md:text-sm text-slate-600 font-medium">
+                    <span class="font-extrabold text-teal-700 block mb-1">💡 Tips Belajar Maksimal:</span>
+                    Pastikan kamu selalu mencoba coret-coret di kertas atau aktifkan tombol <strong>"Papan Cakar"</strong> di pojok kanan atas sebelum menebak jawaban. Klik tombol "Warm-up" di menu kiri untuk memulai tantangan pertama!
+                </div>
+            </div>
+
+            <!-- SECTION 2: WARM-UP (4 slides, 1 slide 2 soal sejenis) -->
+            <div id="section-warmup" class="hidden flex-1 flex flex-col justify-between">
+                <div class="p-6 md:p-8">
+                    <!-- Progress Bar Warm-Up -->
+                    <div class="flex justify-between items-center text-xs font-black text-teal-700 uppercase tracking-wider mb-3">
+                        <span>Pemanasan Pola Berpasangan</span>
+                        <span id="warmup-slide-indicator">Slide 1 dari 4</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden mb-6">
+                        <div id="warmup-progress-bar" class="bg-teal-500 h-full transition-all duration-300" style="width: 25%"></div>
+                    </div>
+
+                    <!-- Slide Content Area -->
+                    <div id="warmup-questions-container" class="space-y-6">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Navigation Footer inside Warm-up -->
+                <div class="bg-slate-50 border-t border-slate-100 px-6 py-4 flex justify-between items-center">
+                    <button onclick="changeWarmupSlide(-1)" id="btn-prev-warmup" class="bg-white border border-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs hover:bg-slate-100 transition disabled:opacity-50">
+                        ◀ Sebelumnya
+                    </button>
+                    <button onclick="changeWarmupSlide(1)" id="btn-next-warmup" class="bg-teal-600 text-white font-bold px-5 py-2 rounded-xl text-xs hover:bg-teal-700 transition">
+                        Selanjutnya ▶
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 3: KONSEP & TEORI LENGKAP -->
+            <div id="section-konsep" class="hidden p-6 md:p-8 space-y-6 overflow-y-auto max-h-[550px] custom-scrollbar">
+                <div>
+                    <span class="bg-teal-100 text-teal-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Materi Inti</span>
+                    <h2 class="heading-font text-2xl md:text-3xl font-black text-slate-800 mt-2">Strategi Membaca Frasa & Pecahan Kompleks</h2>
+                </div>
+
+                <div class="space-y-4 text-xs md:text-sm text-slate-600 leading-relaxed">
+                    <h3 class="font-extrabold text-teal-800 text-sm md:text-base border-b pb-1">1. Tiga Frasa Jebakan Terbesar pada Soal Cerita FDP</h3>
+                    <ul class="space-y-3">
+                        <li class="bg-white border p-3 rounded-xl shadow-sm">
+                            <strong class="text-red-600">Jebakan A: "...dari sisa uang..." vs "...dari total uang..."</strong><br>
+                            Jika kamu memiliki uang Rp100.000, lalu belanja $\frac{1}{2}$ bagian untuk buku, dan kemudian $\frac{1}{2}$ <span class="underline">dari sisa</span> untuk jajan, perhitungannya adalah:<br>
+                            <span class="font-mono bg-slate-50 px-1 text-slate-700">Sisa Buku = Rp100.000 - Rp50.000 = Rp50.000</span><br>
+                            <span class="font-mono bg-slate-50 px-1 text-slate-700">Jajan = $\frac{1}{2} \times \text{Sisa Buku} = \frac{1}{2} \times 50.000 = \text{Rp25.000}$</span> (Bukan Rp50.000!)
+                        </li>
+                        <li class="bg-white border p-3 rounded-xl shadow-sm">
+                            <strong class="text-red-600">Jebakan B: Persen Bertingkat (Double Discounts)</strong><br>
+                            Diskon 50% lalu tambahan diskon 20% (<span class="italic">Diskon 50% + 20%</span>) **TIDAK SAMA** dengan diskon 70%.<br>
+                            Bayangkan barang seharga $x$.<br>
+                            <span class="font-mono bg-slate-50 px-1 text-slate-700">Harga setelah diskon pertama = $0.50x$</span><br>
+                            <span class="font-mono bg-slate-50 px-1 text-slate-700">Harga akhir = $0.80 \times (0.50x) = 0.40x$</span>. Total diskon sesungguhnya adalah **60%** (bukan 70%).
+                        </li>
+                        <li class="bg-white border p-3 rounded-xl shadow-sm">
+                            <strong class="text-red-600">Jebakan C: "Persen lebih banyak" atau "Persen lebih sedikit"</strong><br>
+                            "Uang Budi 25% lebih banyak dari uang Ani" diterjemahkan menjadi:<br>
+                            <span class="font-mono bg-emerald-50 px-1 text-emerald-800 font-bold">$B = A + 0.25A = 1.25A$</span>.<br>
+                            Sebaliknya, "Uang Ani 20% lebih sedikit dari uang Budi" diterjemahkan menjadi:<br>
+                            <span class="font-mono bg-emerald-50 px-1 text-emerald-800 font-bold">$A = B - 0.20B = 0.80B$</span>.
+                        </li>
+                    </ul>
+
+                    <h3 class="font-extrabold text-teal-800 text-sm md:text-base border-b pt-4 pb-1">2. Strategi Lenyapkan Penyebut pada Pecahan Kompleks</h3>
+                    <p>
+                        Pecahan kompleks bertingkat seperti $\frac{\frac{2}{3} + \frac{1}{4}}{\frac{5}{6} - \frac{1}{2}}$ seringkali dikerjakan dengan menyamakan penyebut atas, menyamakan penyebut bawah, lalu membaliknya. Ini memakan waktu dan berisiko salah hitung.
+                    </p>
+                    <div class="bg-teal-50 border-l-4 border-teal-500 p-3.5 rounded-r-xl">
+                        <strong class="text-teal-900 block mb-1">🔥 Cara Kilat SMA: Kalikan Semua Suku dengan KPK Penyebut!</strong>
+                        KPK dari penyebut di atas ($3, 4, 6, 2$) adalah **12**. Kalikan pembilang dan penyebut total dengan **12**:<br>
+                        $$\frac{\left(\frac{2}{3} + \frac{1}{4}\right) \times 12}{\left(\frac{5}{6} - \frac{1}{2}\right) \times 12} = \frac{8 + 3}{10 - 6} = \frac{11}{4} = 2\frac{3}{4}$$
+                        Sangat bersih dan dapat diselesaikan dalam 5 detik!
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: VISUALIZER / SIMULATOR INTERAKTIF -->
+            <div id="section-simulator" class="hidden p-6 md:p-8 space-y-6">
+                <div>
+                    <span class="bg-teal-100 text-teal-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Interactive Lab</span>
+                    <h2 class="heading-font text-2xl md:text-3xl font-black text-slate-800 mt-2">FDP Dynamic Visualizer</h2>
+                    <p class="text-xs md:text-sm text-slate-500 mt-1">Geser slider untuk melihat bagaimana representasi cairan tangki berubah dalam berbagai wujud FDP secara real-time.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    <!-- Left: Dynamic SVG Container Liquid -->
+                    <div class="md:col-span-5 flex flex-col items-center bg-slate-50 p-4 rounded-3xl border border-slate-100">
+                        <svg class="w-36 h-56" viewBox="0 0 100 150">
+                            <!-- Cylinder container outer -->
+                            <rect x="20" y="10" width="60" height="130" rx="10" fill="none" stroke="#334155" stroke-width="4"/>
+                            
+                            <!-- Graduation lines -->
+                            <line x1="15" y1="42.5" x2="25" y2="42.5" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="8" y="45" fill="#64748b" font-size="8" font-family="monospace">75%</text>
+                            
+                            <line x1="15" y1="75" x2="25" y2="75" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="8" y="77.5" fill="#64748b" font-size="8" font-family="monospace">50%</text>
+                            
+                            <line x1="15" y1="107.5" x2="25" y2="107.5" stroke="#94a3b8" stroke-width="2"/>
+                            <text x="8" y="110" fill="#64748b" font-size="8" font-family="monospace">25%</text>
+
+                            <!-- Liquid level clipPath -->
+                            <clipPath id="liquid-clip">
+                                <rect id="liquid-rect" x="22" y="138" width="56" height="0" rx="6" />
+                            </clipPath>
+
+                            <!-- Colored Liquid -->
+                            <rect x="22" y="12" width="56" height="126" rx="6" fill="#0d9488" fill-opacity="0.8" clip-path="url(#liquid-clip)"/>
+                        </svg>
+                        <span id="visualizer-percentage-badge" class="font-extrabold text-teal-700 text-lg mt-3">0% Terisi</span>
+                    </div>
+
+                    <!-- Right: Numerical Conversion Cards -->
+                    <div class="md:col-span-7 space-y-4">
+                        <!-- Slider Input -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black text-slate-500 uppercase tracking-wider">Atur Kapasitas Cairan:</label>
+                            <input oninput="updateVisualizer(this.value)" type="range" min="0" max="100" value="0" class="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-teal-600">
+                        </div>
+
+                        <!-- FDP Cards -->
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-teal-50 border border-teal-100 rounded-2xl p-3">
+                                <span class="text-[10px] font-bold text-teal-600 block mb-1">Pecahan</span>
+                                <span id="val-fraction" class="font-mono font-extrabold text-sm text-teal-900">0/1</span>
+                            </div>
+                            <div class="bg-sky-50 border border-sky-100 rounded-2xl p-3">
+                                <span class="text-[10px] font-bold text-sky-600 block mb-1">Desimal</span>
+                                <span id="val-decimal" class="font-mono font-extrabold text-sm text-sky-900">0,0</span>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-100 rounded-2xl p-3">
+                                <span class="text-[10px] font-bold text-amber-600 block mb-1">Persentase</span>
+                                <span id="val-percentage" class="font-mono font-extrabold text-sm text-amber-900">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- Real-world Application Sentence box -->
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-600 leading-relaxed">
+                            <span class="font-extrabold text-slate-800 block mb-1">🌍 Skenario Dunia Nyata:</span>
+                            <span id="visualizer-realworld">Silakan geser slider untuk memicu simulasi kasus cerita secara dinamis!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: CONTOH SOAL (5 worked examples with step-by-step) -->
+            <div id="section-contoh" class="hidden flex-1 flex flex-col justify-between">
+                <div class="p-6 md:p-8 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <span class="bg-teal-100 text-teal-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Belajar Bersama</span>
+                            <h2 class="heading-font text-2xl md:text-3xl font-black text-slate-800 mt-2">5 Contoh Soal & Bedah Logika</h2>
+                        </div>
+                        <div class="flex gap-1.5" id="contoh-buttons-container">
+                            <!-- Injected buttons by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Worked Example Content Display -->
+                    <div id="worked-example-display" class="bg-slate-50 border border-slate-100 rounded-2xl p-5 md:p-6 min-h-[300px] animate-fade-in flex flex-col justify-between">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 6: SOAL MANDIRI TERBIMBING (5 questions) -->
+            <div id="section-mandiri" class="hidden flex-1 flex flex-col justify-between">
+                <div class="p-6 md:p-8 space-y-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <div>
+                            <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-3 py-1 rounded-full">Tantangan Mandiri</span>
+                            <h2 class="heading-font text-2xl md:text-3xl font-black text-slate-800 mt-2">Asah Kecepatan Penalaranmu</h2>
+                        </div>
+                        <div class="flex gap-1.5" id="mandiri-buttons-container">
+                            <!-- Injected buttons by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Independent Question Display -->
+                    <div id="independent-display" class="bg-white border border-slate-200 rounded-2xl p-5 md:p-6 min-h-[330px] flex flex-col justify-between animate-fade-in">
+                        <!-- Loaded dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- GLOBAL FOOTER INFORMATION -->
+            <div class="bg-slate-50 border-t-2 border-slate-100 px-6 py-3.5 flex justify-between items-center text-[10px] md:text-xs font-bold text-slate-400">
+                <span id="global-section-indicator">Misi Aktif: Lab FDP Mastery</span>
+                <span>Kemajuan Belajar Berkelanjutan</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FLOATING TOAST NOTIFICATION -->
+    <div id="toast" class="hidden fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 text-white font-extrabold px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 animate-bounce">
+        <span id="toast-icon">✨</span> <span id="toast-text">Tepat sekali!</span>
+    </div>
+
+    <!-- CONFETTI CANVAS -->
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-50 w-full h-full hidden"></canvas>
+
+    <script>
+        // --- 1. AUDIO SYNTHESIZER ---
+        let audioCtx;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            try {
+                const ctx = getAudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.24); // C6
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.4);
+                } else if (type === 'incorrect') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(180, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.35);
+                    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.35);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.05, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.05);
+                }
+            } catch (e) {
+                console.log("Audio synthesized successfully.");
+            }
+        }
+
+        // --- 2. DATABASE WARM-UP (8 Soal, 4 slides, 1 slide 2 soal sejenis) ---
+        const warmupSlides = [
+            {
+                slideId: 1,
+                title: "Pecahan Kompleks Sederhana (Pattern Matching)",
+                questions: [
+                    {
+                        id: "w1a",
+                        text: "Hitung penyederhanaan dari:<br>$$\\frac{\\frac{1}{2} + \\frac{1}{3}}{\\frac{5}{6}}$$ (Petunjuk: Kalikan KPK penyebutnya!)",
+                        options: ["$1$", "$\\frac{5}{6}$", "$\\frac{6}{5}$", "$2$"],
+                        correct: "$1$",
+                        explanation: "KPK dari penyebut atas-bawah (2, 3, 6) adalah 6. Kalikan atas dan bawah dengan 6:<br>$$\\frac{\\left(\\frac{1}{2} + \\frac{1}{3}\\right) \\times 6}{\\frac{5}{6} \\times 6} = \\frac{3 + 2}{5} = \\frac{5}{5} = 1$$"
+                    },
+                    {
+                        id: "w1b",
+                        text: "Hitung penyederhanaan dari:<br>$$\\frac{\\frac{1}{3} + \\frac{1}{4}}{\\frac{7}{12}}$$ (Sangat mirip dengan soal sebelah!)",
+                        options: ["$1$", "$\\frac{12}{7}$", "$\\frac{7}{12}$", "$1.5$"],
+                        correct: "$1$",
+                        explanation: "KPK dari penyebut (3, 4, 12) adalah 12. Kalikan atas dan bawah dengan 12:<br>$$\\frac{\\left(\\frac{1}{3} + \\frac{1}{4}\\right) \\times 12}{\\frac{7}{12} \\times 12} = \\frac{4 + 3}{7} = \\frac{7}{7} = 1$$"
+                    }
+                ]
+            },
+            {
+                slideId: 2,
+                title: "Konversi FDP Soal Cerita Bagian Sisa",
+                questions: [
+                    {
+                        id: "w2a",
+                        text: "Budi membagikan $0,4$ bagian gajinya untuk tabungan dan $25\\%$ untuk belanja dapur. Berapa sisa bagian gajinya dalam bentuk pecahan paling sederhana?",
+                        options: ["$\\frac{7}{20}$", "$\\frac{1}{3}$", "$\\frac{2}{5}$", "$\\frac{3}{10}$"],
+                        correct: "$\\frac{7}{20}$",
+                        explanation: "Ubah semua ke pecahan biasa:<br>$0,4 = \\frac{4}{10} = \\frac{2}{5}$ bagian.<br>$25\\% = \\frac{25}{100} = \\frac{1}{4}$ bagian.<br>Total pengeluaran: $\\frac{2}{5} + \\frac{1}{4} = \\frac{8 + 5}{20} = \\frac{13}{20}$.<br>Sisa bagian = $1 - \\frac{13}{20} = \\frac{7}{20}$."
+                    },
+                    {
+                        id: "w2b",
+                        text: "Ani menghabiskan $0,3$ bagian tabungannya untuk membeli buku sekolah dan $40\\%$ untuk sepatu olahraga. Berapa sisa bagian tabungannya?",
+                        options: ["$\\frac{3}{10}$", "$\\frac{7}{10}$", "$\\frac{1}{3}$", "$\\frac{1}{4}$"],
+                        correct: "$\\frac{3}{10}$",
+                        explanation: "Ubah ke pecahan biasa:<br>$0,3 = \\frac{3}{10}$ bagian.<br>$40\\% = \\frac{40}{100} = \\frac{2}{5}$ bagian.<br>Total pengeluaran: $\\frac{3}{10} + \\frac{2}{5} = \\frac{3 + 4}{10} = \\frac{7}{10}$.<br>Sisa bagian = $1 - \\frac{7}{10} = \\frac{3}{10}$."
+                    }
+                ]
+            },
+            {
+                slideId: 3,
+                title: "Persen Bertingkat (Diskon Kumulatif)",
+                questions: [
+                    {
+                        id: "w3a",
+                        text: "Sebuah celana mendapatkan diskon awal $50\\%$ lalu mendapatkan tambahan diskon lagi sebesar $20\\%$. Berapa persen diskon sesungguhnya yang diterima?",
+                        options: ["$60\\%$", "$70\\%$", "$55\\%$", "$65\\%$"],
+                        correct: "$60\\%$",
+                        explanation: "Misalkan harga mula-mula adalah $100$.<br>Setelah diskon $50\\%$, harga menjadi $50$.<br>Diskon tambahan $20\\%$ dari harga $50$ adalah: $0,20 \\times 50 = 10$.<br>Harga akhir setelah diskon bertingkat = $50 - 10 = 40$.<br>Total diskon sesungguhnya = $100 - 40 = 60\\%$."
+                    },
+                    {
+                        id: "w3b",
+                        text: "Sebuah jaket musim dingin mendapatkan diskon awal $40\\%$ lalu ditambah lagi kupon diskon $10\\%$. Berapa total diskon sesungguhnya?",
+                        options: ["$46\\%$", "$50\\%$", "$45\\%$", "$48\\%$"],
+                        correct: "$46\\%$",
+                        explanation: "Misalkan harga mula-mula adalah $100$.<br>Setelah diskon $40\\%$, harga menjadi $60$.<br>Diskon tambahan $10\\%$ dari harga $60$ adalah: $0,10 \\times 60 = 6$.<br>Harga akhir setelah diskon bertingkat = $60 - 6 = 54$.<br>Total diskon sesungguhnya = $100 - 54 = 46\\%$."
+                    }
+                ]
+            },
+            {
+                slideId: 4,
+                title: "Pecahan Kompleks Aljabar & KPK Sederhana",
+                questions: [
+                    {
+                        id: "w4a",
+                        text: "Sederhanakan bentuk pecahan aljabar bertingkat berikut:<br>$$\\frac{1}{1 + \\frac{1}{2}}$$",
+                        options: ["$\\frac{2}{3}$", "$\\frac{3}{2}$", "$\\frac{1}{2}$", "$\\frac{3}{4}$"],
+                        correct: "$\\frac{2}{3}$",
+                        explanation: "Kalikan atas dan bawah dengan penyebut terbawah, yaitu $2$:<br>$$\\frac{1 \\times 2}{\\left(1 + \\frac{1}{2}\\right) \\times 2} = \\frac{2}{2 + 1} = \\frac{2}{3}$$"
+                    },
+                    {
+                        id: "w4b",
+                        text: "Sederhanakan bentuk pecahan aljabar bertingkat sejenis berikut:<br>$$\\frac{1}{1 + \\frac{1}{3}}$$",
+                        options: ["$\\frac{3}{4}$", "$\\frac{4}{3}$", "$\\frac{2}{3}$", "$\\frac{1}{4}$"],
+                        correct: "$\\frac{3}{4}$",
+                        explanation: "Kalikan atas dan bawah dengan penyebut terbawah, yaitu $3$:<br>$$\\frac{1 \\times 3}{\\left(1 + \\frac{1}{3}\\right) \\times 3} = \\frac{3}{3 + 1} = \\frac{3}{4}$$"
+                    }
+                ]
+            }
+        ];
+
+        // --- 3. DATABASE CONTOH SOAL (5 worked examples) ---
+        const contohSoalData = [
+            {
+                id: 1,
+                title: "Campuran Kimia Bertingkat",
+                question: "Sebuah wadah laboratorium berisi $200 \\text{ mL}$ larutan alkohol $15\\%$. Laboran menambahkan $50 \\text{ mL}$ larutan alkohol $40\\%$. Berapa persen konsentrasi akhir campuran larutan alkohol tersebut?",
+                logicalStrategy: "1. Temukan volume alkohol murni di masing-masing larutan mula-mula.<br>2. Jumlahkan semua volume alkohol murni.<br>3. Bagi total volume alkohol murni dengan total volume cairan akhir.",
+                stepByStep: "• Volume alkohol murni larutan 1: $15\\% \\times 200 \\text{ mL} = 30 \\text{ mL}$.<br>• Volume alkohol murni larutan 2: $40\\% \\times 50 \\text{ mL} = 20 \\text{ mL}$.<br>• Total volume alkohol murni = $30 + 20 = 50 \\text{ mL}$.<br>• Total volume cairan akhir = $200 + 50 = 250 \\text{ mL}$.<br>• Konsentrasi alkohol akhir = $\\frac{50}{250} = \\frac{1}{5} = 20\\%$."
+            },
+            {
+                id: 2,
+                title: "Pembagian Aset Bersyarat",
+                question: "Seorang petani membagikan sebidang tanah warisannya. Anak sulung menerima $0,35$ bagian tanah. Anak tengah menerima $\\frac{2}{5}$ bagian tanah dari sisanya. Sisanya diberikan kepada anak bungsu sebesar $1.560 \\text{ m}^2$. Berapakah total luas tanah petani tersebut?",
+                logicalStrategy: "Siswa seringkali langsung mengalikan $\\frac{2}{5}$ dengan total tanah. Padahal kalimatnya berbunyi 'dari sisanya'. Carilah bagian anak sulung terlebih dahulu, cari sisa bagiannya, kalikan pecahan untuk anak tengah, lalu temukan nilai representasi sisa akhir untuk menyetarakan luas tanah anak bungsu.",
+                stepByStep: "• Bagian anak sulung = $0,35 = \\frac{35}{100} = \\frac{7}{20}$ dari total.<br>• Sisa tanah pertama = $1 - \\frac{7}{20} = \\frac{13}{20}$.<br>• Anak tengah = $\\frac{2}{5} \\times \\text{Sisa} = \\frac{2}{5} \\times \\frac{13}{20} = \\frac{26}{100} = 0,26$.<br>• Sisa akhir untuk anak bungsu = $\\text{Sisa pertama} - \\text{Bagian tengah} = \\frac{13}{20} - \\frac{26}{100} = \\frac{65}{100} - \\frac{26}{100} = \\frac{39}{100} = 0,39$ bagian.<br>• Kita tahu $0,39 \\text{ bagian} = 1.560 \\text{ m}^2$. Maka total luas tanah = $\\frac{1.560}{0,39} = 4.000 \\text{ m}^2$."
+            },
+            {
+                id: 3,
+                title: "Diskon Kumulatif Terbalik",
+                question: "Sebuah toko pakaian memasang spanduk diskon bertingkat $30\\% + 10\\%$. Jika seorang pelanggan membayar gaun pesta sebesar Rp378.000,00 setelah kedua diskon diaplikasikan, berapakah harga asli gaun pesta tersebut sebelum diskon?",
+                logicalStrategy: "Jangan tambahkan diskon menjadi 40%! Lakukan pengerjaan mundur. Setelah diskon 10%, gaun tersebut berharga 90% dari harga sebelumnya. Setelah diskon 30%, harganya adalah 70% dari harga aslinya.",
+                stepByStep: "• Misalkan harga asli gaun adalah $H$.<br>• Setelah diskon bertingkat, harga bayar adalah:<br>$$H \\times (1 - 0.30) \\times (1 - 0.10) = 378.000$$<br>$$H \\times (0.70) \\times (0.90) = 378.000$$<br>$$H \\times 0.63 = 378.000$$<br>• Maka harga asli gaun $H$ adalah:<br>$$H = \\frac{378.000}{0.63} = \\text{Rp600.000,00}$$."
+            },
+            {
+                id: 4,
+                title: "Pecahan Kompleks Tak Berhingga",
+                question: "Tentukan nilai konvergensi dari pecahan berlanjut tak berhingga berikut:<br>$$x = \\frac{1}{2 + \\frac{1}{2 + \\frac{1}{2 + \\dots}}}$$",
+                logicalStrategy: "Gunakan konsep substitusi rekursif. Karena pecahan ini berulang tak berhingga ke bawah, maka pola penyebut bertingkat di bawah angka 2 tersebut setara dengan nilai $x$ itu sendiri!",
+                stepByStep: "• Nyatakan pecahan bertingkat dalam bentuk persamaan kuadrat:<br>$$x = \\frac{1}{2 + x}$$<br>• Kalikan silang kedua ruas:<br>$$x(2 + x) = 1 \\Rightarrow x^2 + 2x - 1 = 0$$<br>• Selesaikan menggunakan rumus kuadratis ABC:<br>$$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} = \\frac{-2 \\pm \\sqrt{4 - 4(1)(-1)}}{2} = \\frac{-2 \\pm \\sqrt{8}}{2}$$<br>$$x = \\frac{-2 \\pm 2\\sqrt{2}}{2} = -1 \\pm \\sqrt{2}$$<br>• Karena pecahan bernilai positif, maka diperoleh $x = \\sqrt{2} - 1 \\approx 0.414$."
+            },
+            {
+                id: 5,
+                title: "Tarif Kerja (Proportion Rate)",
+                question: "Mesin pencetak A dapat memproduksi satu set buku dalam waktu $4$ jam. Mesin pencetak B dapat menyelesaikan set yang sama dalam $6$ jam. Jika kedua mesin dinyalakan bersamaan selama $1.5$ jam, berapa bagian buku yang telah selesai diproduksi?",
+                logicalStrategy: "Jumlahkan daya kerja (tarif per jam) kedua mesin dalam bentuk pecahan, kemudian kalikan dengan lamanya waktu pengerjaan.",
+                stepByStep: "• Laju mesin A = $\\frac{1}{4}$ bagian per jam.<br>• Laju mesin B = $\\frac{1}{6}$ bagian per jam.<br>• Total laju gabungan = $\\frac{1}{4} + \\frac{1}{6} = \\frac{3 + 2}{12} = \\frac{5}{12}$ bagian per jam.<br>• Jumlah bagian buku yang diproduksi dalam 1,5 jam ($\\frac{3}{2}$ jam):<br>$$\\text{Bagian Buku} = \\frac{5}{12} \\times 1.5 = \\frac{5}{12} \\times \\frac{3}{2} = \\frac{15}{24} = \\frac{5}{8} \\text{ bagian}$$."
+            }
+        ];
+
+        // --- 4. DATABASE SOAL MANDIRI TERBIMBING (5 questions) ---
+        const mandiriSoalData = [
+            {
+                id: 1,
+                title: "Misi Mandiri 1: Susutan Nilai Tangki Air",
+                question: "Sebuah wadah penampungan air mengalami kebocoran. Pada jam pertama, $\\frac{1}{3}$ bagian air menguap dan keluar. Pada jam kedua, $20\\%$ <span class='underline'>dari sisa air</span> mengalir keluar. Jika sisa air di dalam wadah sekarang adalah $80 \\text{ liter}$, berapakah kapasitas air mula-mula sebelum bocor?",
+                hints: [
+                    "Carilah sisa bagian air setelah jam pertama terlebih dahulu.",
+                    "Sisa jam ke-1 adalah $1 - \\frac{1}{3} = \\frac{2}{3}$ bagian.",
+                    "Jam ke-2 kehilangan $20\\% = \\frac{1}{5}$ dari sisa, artinya sisa akhir adalah $1 - \\frac{1}{5} = \\frac{4}{5}$ dari sisa jam ke-1.",
+                    "Sisa akhir bagian = $\\frac{4}{5} \\times \\frac{2}{3} = \\frac{8}{15}$ bagian."
+                ],
+                options: ["150 liter", "120 liter", "160 liter", "200 liter"],
+                correct: "150 liter",
+                solution: "Sisa akhir bagian adalah $\\frac{8}{15}$ bagian. Kita setarakan dengan volume riil:<br>$$\\frac{8}{15} \\text{ kapasitas} = 80 \\text{ liter}$$<br>$$\\text{Kapasitas} = \\frac{80 \\times 15}{8} = 150 \\text{ liter}$$. Correct!"
+            },
+            {
+                id: 2,
+                title: "Misi Mandiri 2: Pecahan Kompleks KPK Akbar",
+                question: "Sederhanakan pecahan bertingkat kompleks berikut ke dalam bentuk pecahan biasa paling ringkas:<br>$$\\frac{\\frac{3}{4} - \\frac{2}{3}}{\\frac{1}{2} + \\frac{5}{6}}$$ (Gunakan trik kilat KPK!)",
+                hints: [
+                    "Identifikasi semua penyebut pada pecahan bertingkat tersebut: 4, 3, 2, dan 6.",
+                    "KPK dari 4, 3, 2, dan 6 adalah 12.",
+                    "Kalikan pembilang atas dan penyebut bawah seluruhnya dengan 12."
+                ],
+                options: ["$\\frac{1}{16}$", "$\\frac{1}{12}$", "$\\frac{5}{16}$", "$\\frac{1}{8}$"],
+                correct: "$\\frac{1}{16}$",
+                solution: "Kalikan atas dan bawah dengan 12:<br>$$\\frac{\\left(\\frac{3}{4} - \\frac{2}{3}\\right) \\times 12}{\\left(\\frac{1}{2} + \\frac{5}{6}\\right) \\times 12} = \\frac{9 - 8}{6 + 10} = \\frac{1}{16}$$."
+            },
+            {
+                id: 3,
+                title: "Misi Mandiri 3: Perbandingan Persen Massa",
+                question: "Suatu logam campuran tembaga dan timah memiliki berat $120 \\text{ gram}$ dengan kadar tembaga $30\\%$. Berapa gram tembaga murni yang harus ditambahkan ke logam campuran tersebut agar kadar tembaganya naik menjadi $44\\%$?",
+                hints: [
+                    "Tentukan berat tembaga murni awal: $30\\% \\times 120 = 36 \\text{ gram}.",
+                    "Jika kita menambahkan $x$ gram tembaga murni, maka total berat tembaga menjadi $36 + x$ dan total berat campuran menjadi $120 + x$.",
+                    "Gunakan persamaan: $\\frac{36 + x}{120 + x} = 44\\% = 0,44 = \\frac{11}{25}$."
+                ],
+                options: ["30 gram", "25 gram", "20 gram", "35 gram"],
+                correct: "30 gram",
+                solution: "Selesaikan persamaan:<br>$$\\frac{36+x}{120+x} = \\frac{11}{25}$$<br>$$25(36 + x) = 11(120 + x)$$<br>$$900 + 25x = 1320 + 11x$$<br>$$14x = 420 \\Rightarrow x = 30 \\text{ gram}$$. Tepat!"
+            },
+            {
+                id: 4,
+                title: "Misi Mandiri 4: Pecahan Bertingkat Aljabar Tinggi",
+                question: "Tentukan bentuk paling sederhana dari pecahan bertingkat aljabar berikut:<br>$$\\frac{a}{a - \\frac{a}{a - 1}}$$ (Untuk $a \\neq 1$ dan $a \\neq 2$)",
+                hints: [
+                    "Kalikan pembilang dan penyebut dengan penyebut terbawah yaitu $(a - 1)$.",
+                    "Pembilang menjadi: $a \\times (a - 1) = a^2 - a$.",
+                    "Penyebut menjadi: $\\left(a - \\frac{a}{a - 1}\\right) \\times (a - 1) = a(a-1) - a = a^2 - 2a$."
+                ],
+                options: ["$\\frac{a-1}{a-2}$", "$\\frac{a}{a-1}$", "$\\frac{a-1}{a}$", "$\\frac{a-2}{a-1}$"],
+                correct: "$\\frac{a-1}{a-2}$",
+                solution: "Sederhanakan hasil pembagian:<br>$$\\frac{a(a-1)}{a^2 - 2a} = \\frac{a(a-1)}{a(a-2)} = \\frac{a-1}{a-2}$$. Sangat rapi!"
+            },
+            {
+                id: 5,
+                title: "Misi Mandiri 5: Tabungan Bunga Majemuk Terselubung",
+                question: "Sebuah aset investasi mengalami pertumbuhan nilai sebesar $10\\%$ pada tahun pertama, namun mengalami penurunan nilai sebesar $10\\%$ pada tahun kedua akibat resesi ekonomi global. Berapakah persentase perubahan nilai aset akhir terhadap nilai investasi awal?",
+                hints: [
+                    "Misalkan nilai investasi mula-mula adalah $100$ unit.",
+                    "Pada akhir tahun pertama, aset menjadi: $100 + 10\\% = 110$ unit.",
+                    "Pada akhir tahun kedua, aset turun $10\\%$ dari nilai tahun pertama ($110$). Hitung pengurangan: $10\\% \\times 110 = 11$ unit."
+                ],
+                options: ["Turun 1%", "Tetap 0%", "Naik 1%", "Turun 2%"],
+                correct: "Turun 1%",
+                solution: "Nilai akhir aset pada tahun kedua = $110 - 11 = 99$ unit.<br>Perubahan terhadap nilai awal ($100$) adalah $99 - 100 = -1$ unit, yang berarti **Turun 1%**."
+            }
+        ];
+
+        // --- 5. APP SYSTEM LOGIC & STATE MACHINE ---
+        let score = 0;
+        let activeWarmupSlide = 0; // Warmup slide ranges 0 to 3
+        let activeWorkedExampleId = 1;
+        let activeIndependentId = 1;
+
+        // Interactive states for hints
+        let unlockedHintsCount = 0;
+
+        // Canvas Drawing Setup
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let brushColor = '#0d9488'; // default teal
+
+        // Confetti Canvas Setup
+        const confettiCanvas = document.getElementById('confetti');
+        const confettiCtx = confettiCanvas.getContext('2d');
+        let confettiActive = false;
+        let particles = [];
+
+        // App Initializer
+        window.onload = function() {
+            switchSection('tujuan');
+            initCanvas();
+            updateVisualizer(0); // Set initial level of visualizer
+        };
+
+        // Section Router
+        function switchSection(sectionId) {
+            playSound('click');
+            
+            // Hide all sections
+            document.getElementById('section-tujuan').classList.add('hidden');
+            document.getElementById('section-warmup').classList.add('hidden');
+            document.getElementById('section-konsep').classList.add('hidden');
+            document.getElementById('section-simulator').classList.add('hidden');
+            document.getElementById('section-contoh').classList.add('hidden');
+            document.getElementById('section-mandiri').classList.add('hidden');
+
+            // Remove active style from nav buttons
+            const navs = ['tujuan', 'warmup', 'konsep', 'simulator', 'contoh', 'mandiri'];
+            navs.forEach(n => {
+                const btn = document.getElementById(`nav-${n}`);
+                btn.className = "w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 text-slate-600 hover:bg-slate-50";
+            });
+
+            // Show active section and highlight its nav button
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden');
+            document.getElementById(`nav-${sectionId}`).className = "w-full text-left px-4 py-3 rounded-2xl font-bold text-xs md:text-sm transition flex items-center gap-3 bg-teal-50 text-teal-900 border border-teal-100";
+
+            // Update footer info
+            const secNames = {
+                tujuan: "Tujuan Belajar",
+                warmup: "Warm-up (Pola Berpasangan)",
+                konsep: "Konsep & Teori FDP",
+                simulator: "Lab Visualizer Interaktif",
+                contoh: "Contoh Soal & Bedah Logika",
+                mandiri: "Latihan Mandiri Terbimbing"
+            };
+            document.getElementById('global-section-indicator').innerText = `Misi Aktif: ${secNames[sectionId]}`;
+
+            // Lazy loaded triggers
+            if (sectionId === 'warmup') {
+                renderWarmupSlide();
+            } else if (sectionId === 'contoh') {
+                renderContohTabButtons();
+                loadWorkedExample(activeWorkedExampleId);
+            } else if (sectionId === 'mandiri') {
+                renderMandiriTabButtons();
+                loadIndependentQuestion(activeIndependentId);
+            }
+
+            // MathJax typesetting refresh
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // --- 6. WARM-UP RENDERING LOGIC ---
+        function renderWarmupSlide() {
+            const container = document.getElementById('warmup-questions-container');
+            const data = warmupSlides[activeWarmupSlide];
+
+            document.getElementById('warmup-slide-indicator').innerText = `Slide ${activeWarmupSlide + 1} dari ${warmupSlides.length}`;
+            document.getElementById('warmup-progress-bar').style.width = `${((activeWarmupSlide + 1) / warmupSlides.length) * 100}%`;
+
+            // Adjust Footer Buttons State
+            document.getElementById('btn-prev-warmup').disabled = activeWarmupSlide === 0;
+            if (activeWarmupSlide === warmupSlides.length - 1) {
+                document.getElementById('btn-next-warmup').innerText = "Selesai Pemanasan 🎉";
+            } else {
+                document.getElementById('btn-next-warmup').innerText = "Selanjutnya ▶";
+            }
+
+            let html = `
+                <h3 class="font-extrabold text-slate-800 text-sm md:text-base border-b pb-2 flex items-center gap-2">
+                    <span class="bg-teal-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">${activeWarmupSlide + 1}</span>
+                    ${data.title}
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            `;
+
+            data.questions.forEach((q, idx) => {
+                html += `
+                    <div class="bg-white border-2 border-slate-200 hover:border-teal-400 p-5 rounded-2xl shadow-sm transition flex flex-col justify-between min-h-[240px]">
+                        <div>
+                            <span class="bg-slate-100 text-slate-700 font-extrabold text-[10px] px-2 py-0.5 rounded-md uppercase">Soal ${idx === 0 ? 'A' : 'B'}</span>
+                            <p class="text-xs md:text-sm text-slate-700 font-bold mt-2 leading-relaxed">${q.text}</p>
+                        </div>
+                        <div class="mt-4 space-y-2">
+                            <div class="grid grid-cols-2 gap-2" id="opts-${q.id}">
+                `;
+
+                q.options.forEach(opt => {
+                    html += `
+                        <button onclick="checkWarmupAnswer(this, '${opt}', '${q.correct}', '${q.id}')" class="bg-slate-50 hover:bg-slate-100 border text-[11px] md:text-xs font-bold text-slate-700 p-2.5 rounded-xl transition text-center">
+                            ${opt}
+                        </button>
+                    `;
+                });
+
+                html += `
+                            </div>
+                            <div id="explain-${q.id}" class="hidden bg-emerald-50 text-emerald-800 text-[11px] font-medium p-3 rounded-xl border border-emerald-100 mt-2 leading-relaxed">
+                                <!-- Injected dynamically upon answering -->
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+
+            // Trigger typesetting
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function changeWarmupSlide(direction) {
+            const nextSlide = activeWarmupSlide + direction;
+            if (nextSlide >= 0 && nextSlide < warmupSlides.length) {
+                activeWarmupSlide = nextSlide;
+                renderWarmupSlide();
+            } else if (nextSlide === warmupSlides.length) {
+                // Done warmups! Send user to Concepts tab
+                switchSection('konsep');
+                showToast("🏆 Pemanasan Selesai! Kamu mendapatkan 50 XP bonus!", "bg-teal-600");
+                score += 50;
+                document.getElementById('score-display').innerText = `${score} XP`;
+                triggerConfetti();
+            }
+        }
+
+        function checkWarmupAnswer(btnElement, selected, correct, questionId) {
+            const parent = document.getElementById(`opts-${questionId}`);
+            
+            // Disable all options in the grid
+            Array.from(parent.children).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-40');
+            });
+
+            const isCorrect = selected === correct;
+            const explainDiv = document.getElementById(`explain-${questionId}`);
+
+            // Fetch the specific question object
+            let foundQuestion = null;
+            warmupSlides.forEach(slide => {
+                const q = slide.questions.find(item => item.id === questionId);
+                if (q) foundQuestion = q;
+            });
+
+            if (isCorrect) {
+                btnElement.classList.remove('opacity-40', 'bg-slate-50');
+                btnElement.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-800', 'font-black');
+                playSound('correct');
+                score += 15;
+                document.getElementById('score-display').innerText = `${score} XP`;
+                showToast("✨ Tepat sekali! Polanya terpecahkan! +15 XP", "bg-emerald-600");
+                triggerConfetti();
+            } else {
+                btnElement.classList.remove('opacity-40', 'bg-slate-50');
+                btnElement.classList.add('border-red-400', 'bg-red-50', 'text-red-800');
+                playSound('incorrect');
+                showToast("💡 Kurang tepat. Baca pembahasan di bawah!", "bg-red-500");
+            }
+
+            explainDiv.innerHTML = `<strong>Kunci Pembahasan:</strong> ${foundQuestion.explanation}`;
+            explainDiv.classList.remove('hidden');
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([btnElement, explainDiv]);
+            }
+        }
+
+        // --- 7. VISUALIZER / SIMULATOR LOGIC ---
+        function updateVisualizer(val) {
+            const percentage = parseInt(val);
+            document.getElementById('visualizer-percentage-badge').innerText = `${percentage}% Terisi`;
+            
+            // Update liquid heights inside SVG. 
+            // Full height is 126px, starting at Y=138.
+            const newHeight = (percentage / 100) * 126;
+            const newY = 138 - newHeight;
+            
+            const liquidRect = document.getElementById('liquid-rect');
+            liquidRect.setAttribute('y', newY);
+            liquidRect.setAttribute('height', newHeight);
+
+            // Calculate conversions
+            // 1. Decimal
+            const decVal = (percentage / 100).toFixed(2).replace('.', ',');
+            document.getElementById('val-decimal').innerText = decVal;
+
+            // 2. Percentage
+            document.getElementById('val-percentage').innerText = `${percentage}%`;
+
+            // 3. Simplified Fraction using Greatest Common Divisor (GCD)
+            const simplifiedFrac = getSimplifiedFraction(percentage, 100);
+            document.getElementById('val-fraction').innerText = simplifiedFrac;
+
+            // Real-world dynamic story generator
+            const realworldText = document.getElementById('visualizer-realworld');
+            if (percentage === 0) {
+                realworldText.innerHTML = "Wadah benar-benar kosong ($0$). Seluruh komponen FDP setara dengan nilai nol.";
+            } else if (percentage === 50) {
+                realworldText.innerHTML = "Setengah tangki penuh! Mewakili pecahan $\\frac{1}{2}$ atau desimal $0,5$. Di dalam soal cerita, ini setara dengan mengalikan kapasitas dengan setengah bagian.";
+            } else if (percentage === 100) {
+                realworldText.innerHTML = "Kapasitas penuh utuh ($100\\%$ atau satu bagian bulat). Tidak ada lagi sisa penampungan yang dapat ditambahkan.";
+            } else {
+                realworldText.innerHTML = `Jika tangki penampung ini berkapasitas $400 \\text{ liter}$, maka cairan yang terisi di dalamnya saat ini setara dengan:<br>
+                <strong>${percentage}\\% \\times 400 = ${Math.round((percentage/100)*400)} \\text{ liter}</strong> (Atau dalam perkalian desimal: $0,${percentage.toString().padStart(2,'0')} \\times 400$).`;
+            }
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([realworldText]);
+            }
+        }
+
+        function getSimplifiedFraction(num, den) {
+            if (num === 0) return "0/1";
+            const gcd = function(a, b) {
+                return b ? gcd(b, a % b) : a;
+            };
+            const divisor = gcd(num, den);
+            return `${num / divisor}/${den / divisor}`;
+        }
+
+        // --- 8. CONTOH SOAL DISPLAY & TAB BINDING ---
+        function renderContohTabButtons() {
+            const container = document.getElementById('contoh-buttons-container');
+            container.innerHTML = '';
+            
+            contohSoalData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition border ${activeWorkedExampleId === item.id ? 'bg-teal-600 border-teal-600 text-white shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'}`;
+                btn.innerText = item.id;
+                btn.onclick = () => loadWorkedExample(item.id);
+                container.appendChild(btn);
+            });
+        }
+
+        function loadWorkedExample(id) {
+            playSound('click');
+            activeWorkedExampleId = id;
+            renderContohTabButtons();
+
+            const data = contohSoalData.find(item => item.id === id);
+            const display = document.getElementById('worked-example-display');
+
+            display.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-center mb-2.5">
+                        <span class="bg-sky-100 text-sky-800 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-md">Contoh ${data.id}: ${data.title}</span>
+                    </div>
+                    <p class="text-xs md:text-sm font-extrabold text-slate-800 mb-4 leading-relaxed">${data.question}</p>
+                    
+                    <div class="bg-amber-50/70 border-l-4 border-amber-500 p-3.5 rounded-r-xl text-xs text-amber-900 mb-4 leading-relaxed">
+                        <strong class="block mb-1">🎯 Strategi Membaca Logika:</strong>
+                        ${data.logicalStrategy}
+                    </div>
+
+                    <div class="bg-white border border-slate-100 rounded-xl p-4 text-xs md:text-sm text-slate-600 font-medium">
+                        <strong class="text-teal-800 block mb-2 font-black">⚙️ Langkah Solusi Aljabar Bertahap:</strong>
+                        <div class="space-y-2 leading-relaxed font-mono text-[11px] md:text-xs">
+                            ${data.stepByStep}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([display]);
+            }
+        }
+
+        // --- 9. SOAL MANDIRI TERBIMBING LOGIC ---
+        function renderMandiriTabButtons() {
+            const container = document.getElementById('mandiri-buttons-container');
+            container.innerHTML = '';
+            
+            mandiriSoalData.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = `w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition border ${activeIndependentId === item.id ? 'bg-amber-500 border-amber-500 text-white shadow-sm' : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'}`;
+                btn.innerText = item.id;
+                btn.onclick = () => loadIndependentQuestion(item.id);
+                container.appendChild(btn);
+            });
+        }
+
+        function loadIndependentQuestion(id) {
+            playSound('click');
+            activeIndependentId = id;
+            unlockedHintsCount = 0; // Reset hints count on changing question
+            renderMandiriTabButtons();
+
+            const data = mandiriSoalData.find(item => item.id === id);
+            const display = document.getElementById('independent-display');
+
+            display.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-black uppercase px-2.5 py-0.5 rounded-md">Misi Mandiri ${data.id}: ${data.title}</span>
+                    </div>
+                    <p class="text-xs md:text-sm text-slate-800 font-bold leading-relaxed mb-4">${data.question}</p>
+                    
+                    <!-- Choices -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 mb-5" id="mandiri-opts-${data.id}">
+                        ${data.options.map(opt => `
+                            <button onclick="checkMandiriAnswer(this, '${opt}', '${data.correct}', '${data.id}')" class="bg-slate-50 hover:bg-slate-100 border text-xs font-bold text-slate-700 p-3 rounded-xl transition text-center">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Hints Area -->
+                    <div class="border border-dashed border-amber-300 rounded-2xl p-4 bg-amber-50/20">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-black text-amber-700 uppercase tracking-wide">💡 Bantuan Petunjuk Bertahap:</span>
+                            <button onclick="unlockNextHint('${data.id}')" id="hint-unlock-btn" class="bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black px-3 py-1 rounded-lg transition active:scale-95 shadow-sm">
+                                🔓 Buka Petunjuk Baru
+                            </button>
+                        </div>
+                        <div id="hints-list" class="space-y-1.5 text-xs text-slate-500 leading-relaxed min-h-[30px] font-medium">
+                            <span class="italic text-slate-400">Butuh bantuan logika berpikir? Klik tombol di atas untuk melihat petunjuk bertahap tanpa membocorkan langsung jawabannya!</span>
+                        </div>
+                    </div>
+
+                    <!-- Full Solution Box (Initially Hidden) -->
+                    <div id="mandiri-solution-box" class="hidden bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-xs md:text-sm text-emerald-900 mt-4 leading-relaxed font-mono">
+                        <!-- Injected on answering -->
+                    </div>
+                </div>
+            `;
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([display]);
+            }
+        }
+
+        function unlockNextHint(questionId) {
+            playSound('click');
+            const data = mandiriSoalData.find(item => item.id === parseInt(questionId));
+            const listContainer = document.getElementById('hints-list');
+
+            if (unlockedHintsCount === 0) {
+                listContainer.innerHTML = '';
+            }
+
+            if (unlockedHintsCount < data.hints.length) {
+                const li = document.createElement('div');
+                li.className = "bg-white p-2 rounded-lg border border-amber-100 text-[11px] text-amber-800 animate-fade-in font-medium";
+                li.innerHTML = `• ${data.hints[unlockedHintsCount]}`;
+                listContainer.appendChild(li);
+                
+                unlockedHintsCount++;
+
+                if (unlockedHintsCount === data.hints.length) {
+                    document.getElementById('hint-unlock-btn').disabled = true;
+                    document.getElementById('hint-unlock-btn').className = "bg-slate-200 text-slate-400 text-[10px] font-bold px-3 py-1 rounded-lg cursor-not-allowed";
+                }
+
+                if (window.MathJax) {
+                    MathJax.typesetPromise([li]);
+                }
+            }
+        }
+
+        function checkMandiriAnswer(btnElement, selected, correct, questionId) {
+            const parent = document.getElementById(`mandiri-opts-${questionId}`);
+            
+            Array.from(parent.children).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-40');
+            });
+
+            const isCorrect = selected === correct;
+            const solutionBox = document.getElementById('mandiri-solution-box');
+            const data = mandiriSoalData.find(item => item.id === parseInt(questionId));
+
+            if (isCorrect) {
+                btnElement.classList.remove('opacity-40', 'bg-slate-50');
+                btnElement.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-800', 'font-black');
+                playSound('correct');
+                score += 30;
+                document.getElementById('score-display').innerText = `${score} XP`;
+                showToast("🏆 Sempurna! Kamu luar biasa tangguh menghalau jebakan! +30 XP", "bg-emerald-600");
+                triggerConfetti();
+            } else {
+                btnElement.classList.remove('opacity-40', 'bg-slate-50');
+                btnElement.classList.add('border-red-400', 'bg-red-50', 'text-red-800');
+                playSound('incorrect');
+                showToast("💡 Kurang tepat. Baca solusi aljabar di bawah!", "bg-red-500");
+            }
+
+            solutionBox.innerHTML = `<strong>Kunci Solusi Penyelidikan Aljabar:</strong><br>${data.solution}`;
+            solutionBox.classList.remove('hidden');
+
+            if (window.MathJax) {
+                MathJax.typesetPromise([btnElement, solutionBox]);
+            }
+        }
+
+        // --- 10. FLOATING TOAST SYSTEM ---
+        function showToast(text, bgClass) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            toast.className = `fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 text-white font-extrabold px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 animate-bounce ${bgClass}`;
+            toastText.innerHTML = text;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 5000);
+        }
+
+        // --- 11. INTERACTIVE SKETCHPAD (PAPAN CAKAR) ---
+        function toggleScratchpad() {
+            playSound('click');
+            scratchpad.classList.toggle('hidden');
+            if (!scratchpad.classList.contains('hidden')) {
+                resizeCanvas();
+            }
+        }
+
+        function resizeCanvas() {
+            const parent = canvas.parentNode;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = 3.5;
+            ctx.strokeStyle = brushColor;
+        }
+
+        function setCanvasColor(color) {
+            playSound('click');
+            brushColor = color;
+            ctx.strokeStyle = color;
+        }
+
+        function clearCanvas() {
+            playSound('click');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function initCanvas() {
+            // Mouse Events
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                ctx.beginPath();
+                const r = canvas.getBoundingClientRect();
+                ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+            });
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing) return;
+                const r = canvas.getBoundingClientRect();
+                ctx.lineTo(e.clientX - r.left, e.clientY - r.top);
+                ctx.stroke();
+            });
+            window.addEventListener('mouseup', () => isDrawing = false);
+
+            // Touch Mobile Events
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isDrawing = true;
+                ctx.beginPath();
+                const t = e.touches[0];
+                const r = canvas.getBoundingClientRect();
+                ctx.moveTo(t.clientX - r.left, t.clientY - r.top);
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!isDrawing) return;
+                const t = e.touches[0];
+                const r = canvas.getBoundingClientRect();
+                ctx.lineTo(t.clientX - r.left, t.clientY - r.top);
+                ctx.stroke();
+            });
+            canvas.addEventListener('touchend', () => isDrawing = false);
+        }
+
+        // --- 12. CONFETTI CELEBRATION SYSTEM ---
+        function triggerConfetti() {
+            confettiActive = true;
+            confettiCanvas.classList.remove('hidden');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+            
+            particles = [];
+            for (let i = 0; i < 65; i++) {
+                particles.push({
+                    x: Math.random() * confettiCanvas.width,
+                    y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                    r: Math.random() * 5 + 4,
+                    d: Math.random() * confettiCanvas.height,
+                    color: `hsl(${Math.random() * 360}, 90%, 65%)`,
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngleIncremental: Math.random() * 0.08 + 0.02,
+                    tiltAngle: 0
+                });
+            }
+
+            animateConfetti();
+            setTimeout(() => {
+                confettiActive = false;
+                confettiCanvas.classList.add('hidden');
+            }, 2000);
+        }
+
+        function animateConfetti() {
+            if (!confettiActive) return;
+            confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            
+            particles.forEach((p, idx) => {
+                p.tiltAngle += p.tiltAngleIncremental;
+                p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle);
+                p.tilt = Math.sin(p.tiltAngle - idx / 3) * 15;
+
+                confettiCtx.beginPath();
+                confettiCtx.lineWidth = p.r;
+                confettiCtx.strokeStyle = p.color;
+                confettiCtx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                confettiCtx.stroke();
+            });
+
+            requestAnimationFrame(animateConfetti);
+        }
+    </script>
+</body>
+</html>
